@@ -3,6 +3,6 @@ export default {
   showDailyReturn: true,
   showPFIndex: true,
   showPFValue: true,
-  startDate: new Date(),
-  finishDate: new Date(),
+  startDate: null,
+  finishDate: null,
 };

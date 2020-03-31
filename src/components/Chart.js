@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
+import day from 'dayjs';
 import PropTypes from 'prop-types';
 import Chartjs from 'chart.js';
 
@@ -10,7 +11,7 @@ const randomColor = () => {
 };
 
 const chartConfig = {
-  type: 'bar',
+  type: 'line',
   options: { scales: { yAxes: [{ ticks: { beginAtZero: true } }] } },
 };
 
@@ -19,7 +20,7 @@ const dataToConfig = (data, label) => {
   return {
     type: chartConfig.type,
     data: {
-      labels: data.map((_label) => _label.x),
+      labels: data.map((_label) => day(_label.x).format('MMM D')),
       datasets: [{
         label,
         data: data.map((_data) => _data.y),

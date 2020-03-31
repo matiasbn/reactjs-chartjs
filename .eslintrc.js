@@ -26,6 +26,7 @@ module.exports = {
     'object-curly-newline': ["error", { "multiline": true }],
     "max-len": 0,
     "no-case-declarations": 0,
-    "no-param-reassign": 0
+    "no-param-reassign": 0,
+    "react/prop-types": 0
   }
 };
