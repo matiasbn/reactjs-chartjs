@@ -8,10 +8,6 @@ export default function NavBar() {
   const dispatch = useDispatch();
   const startDate = useSelector((state) => state.startDate);
   const finishDate = useSelector((state) => state.finishDate);
-  //   const finishDate = useSelector((state) => state.finishDate);
-  //   const finishDate = useSelector((state) => state.finishDate);
-  //   const finishDate = useSelector((state) => state.finishDate);
-  //   const finishDate = useSelector((state) => state.finishDate);
 
   return (
     <Navbar bg="dark" expand="lg" variant="dark" sticky="top">

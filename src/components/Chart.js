@@ -11,7 +11,7 @@ const randomColor = () => {
 };
 
 const chartConfig = {
-  type: 'line',
+  type: 'bar',
   options: { scales: { yAxes: [{ ticks: { beginAtZero: true } }] } },
 };
 
