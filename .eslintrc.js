@@ -24,6 +24,8 @@ module.exports = {
   rules: {
     "react/jsx-filename-extension": 0,
     'object-curly-newline': ["error", { "multiline": true }],
-    "max-len": 0
-  },
+    "max-len": 0,
+    "no-case-declarations": 0,
+    "no-param-reassign": 0
+  }
 };

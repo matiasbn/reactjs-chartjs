@@ -1,44 +1,40 @@
 import React, { useEffect, useRef, useState } from 'react';
+import PropTypes from 'prop-types';
 import Chartjs from 'chart.js';
-import { useFirestoreDocData, useFirestore } from 'reactfire';
-import day from 'dayjs';
-import { Card, Row, Col } from 'react-bootstrap';
+
+const randomColor = () => {
+  const r = Math.floor(Math.random() * 255);
+  const g = Math.floor(Math.random() * 255);
+  const b = Math.floor(Math.random() * 255);
+  return `rgba(${r},${g},${b}, __type__)`;
+};
 
 const chartConfig = {
-  type: 'line',
+  type: 'bar',
   options: { scales: { yAxes: [{ ticks: { beginAtZero: true } }] } },
 };
 
-const dataToConfig = (data, label) => ({
-  type: chartConfig.type,
-  data: {
-    labels: data.map((_label) => _label.x),
-    datasets: [{
-      label,
-      data: data.map((_data) => _data.y),
-    }],
-  },
-  option: chartConfig.options,
-});
+const dataToConfig = (data, label) => {
+  const colors = data.map(() => randomColor());
+  return {
+    type: chartConfig.type,
+    data: {
+      labels: data.map((_label) => _label.x),
+      datasets: [{
+        label,
+        data: data.map((_data) => _data.y),
+        backgroundColor: colors.map((color) => color.replace('__type__', '0.2')),
+        borderColor: colors.map((color) => color.replace('__type__', '1')),
+      }],
+    },
+    option: chartConfig.options,
+  };
+};
 
-export default function Chart() {
-  const contributionsContainer = useRef(null);
-  const dailyContainer = useRef(null);
-  const pfIndexContainer = useRef(null);
-  const pfValueContainer = useRef(null);
-  const [contributionsInstance, setContributionsInstance] = useState(null);
-  const [dailyInstance, setDailyInstance] = useState(null);
-  const [pFIndexInstance, setPFIndexInstance] = useState(null);
-  const [pFValueInstance, setPFValueInstance] = useState(null);
-
-  const userRef = useFirestore().collection('investmentEvolutions').doc('user1');
-  const { array: user } = useFirestoreDocData(userRef);
-
-  const contributions = user.map((data) => ({ y: data.contributions, x: day(data.date.seconds * 1000).format('MMM D') }));
-  const dailyReturn = user.map((data) => ({ y: data.dailyReturn, x: day(data.date.seconds * 1000).format('MMM D') }));
-  const portfolioIndex = user.map((data) => ({ y: data.portfolioIndex, x: day(data.date.seconds * 1000).format('MMM D') }));
-  const portfolioValue = user.map((data) => ({ y: data.portfolioValue, x: day(data.date.seconds * 1000).format('MMM D') }));
-
+export default function Chart(props) {
+  const { data, title } = props;
+  const container = useRef(null);
+  const [chartInstance, setChartInstance] = useState(null);
 
   const updateInstance = (instance, newData) => {
     instance.data = dataToConfig(newData, instance.data.datasets[0].label).data;
@@ -46,60 +42,27 @@ export default function Chart() {
   };
 
   useEffect(() => {
-    if (contributionsInstance) {
-      updateInstance(contributionsInstance, contributions);
+    if (chartInstance) {
+      updateInstance(chartInstance, data);
     }
-    if (dailyInstance) {
-      updateInstance(dailyInstance, dailyReturn);
-    }
-    if (pFIndexInstance) {
-      updateInstance(pFIndexInstance, portfolioIndex);
-    }
-    if (pFValueInstance) {
-      updateInstance(pFValueInstance, portfolioValue);
-    }
-  }, [user]);
+  }, [data]);
 
 
   useEffect(() => {
-    if (contributionsContainer && contributionsContainer.current) {
-      const contInstance = new Chartjs(contributionsContainer.current, dataToConfig(contributions, 'Contributions'));
-      const dInstance = new Chartjs(dailyContainer.current, dataToConfig(dailyReturn, 'Daily return'));
-      const pfiInstance = new Chartjs(pfIndexContainer.current, dataToConfig(portfolioIndex, 'Portfolio Index'));
-      const pfvInstance = new Chartjs(pfValueContainer.current, dataToConfig(portfolioValue, 'Portfolio Value'));
-      setContributionsInstance(contInstance);
-      setDailyInstance(dInstance);
-      setPFIndexInstance(pfiInstance);
-      setPFValueInstance(pfvInstance);
+    if (container && container.current) {
+      const contInstance = new Chartjs(container.current, dataToConfig(data, title));
+      setChartInstance(contInstance);
     }
-  }, [contributionsContainer]);
-
+  }, [container]);
   return (
     <div>
-      <Row>
-        <Col>
-          <Card>
-            <canvas ref={contributionsContainer} />
-          </Card>
-        </Col>
-        <Col>
-          <Card>
-            <canvas ref={dailyContainer} />
-          </Card>
-        </Col>
-      </Row>
-      <Row>
-        <Col>
-          <Card>
-            <canvas ref={pfIndexContainer} />
-          </Card>
-        </Col>
-        <Col>
-          <Card>
-            <canvas ref={pfValueContainer} />
-          </Card>
-        </Col>
-      </Row>
+      <canvas ref={container} />
     </div>
   );
 }
+
+Chart.propTypes = {
+  // eslint-disable-next-line react/forbid-prop-types
+  data: PropTypes.array.isRequired,
+  title: PropTypes.string.isRequired,
+};
